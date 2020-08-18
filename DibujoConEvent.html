@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>eventListener</title>
+	<!--
+	<style type="text/css">
+		.content{
+			width: 100%;
+			min-height: 100%;
+			background-color: green;
+			margin: auto;
+		}
+		canvas{
+			background-color: white;
+			margin: auto;
+		}
+	</style>
+	-->
+</head>
+<body>
+	<div class="content">
+		<canvas id="canvas" width="1600" height="1400"></canvas>
+	</div>
+	<script type="text/javascript">
+		var canvas = document.getElementById('canvas');
+		var presiono = false;
+		if(canvas.getContext){
+			var ctx = canvas.getContext('2d');
+
+			canvas.addEventListener('mousedown', function(evt){
+				presiono = true;
+			});
+
+			canvas.addEventListener('mouseup', function(evt){
+				presiono = false;
+			});
+
+			canvas.addEventListener('mousemove', function(evt){
+				if (presiono) {
+					ctx.fillStyle = "pink";
+					ctx.beginPath();
+					ctx.arc(evt.layerX, evt.layerY, 5, 0, 2 * Math.PI);
+					ctx.fill();
+				}
+			});
+		}else{
+			alert('No se puede cargar canvas');
+		}
+	</script>
+</body>
+</html>
