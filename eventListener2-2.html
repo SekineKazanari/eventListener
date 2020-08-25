@@ -23,7 +23,8 @@
 	</div>
 	<script type="text/javascript">
 		var canvas = null, ctx = null, x = 0, y = 0;
-		var btn = 65, speed = 5, player = null, food = null, contador = 0;
+		var btn = 65, speed = 5, player = null, food = null;
+		var contador = 0, pausa = false, over = false, muros = new Array();
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -50,51 +51,88 @@
 			ctx.fillText("Marcador:", 380, 20);
 			ctx.fillText(contador, 420, 40);
 
+			ctx.fillStyle = "#B1B1B1";
+			for (var i = muros.length - 1; i >= 0; i--) {
+				muros[i].paint(ctx);
+			}
+
+			if(pausa){
+				ctx.font = "18px Arial";
+				ctx.fillStyle = "red";
+				ctx.fillText("PAUSA", 210, 80);
+				ctx.font = "15px Arial";
+				ctx.fillStyle = "white";
+				ctx.fillText("Presiona P para continuar", 155, 105);
+			} 
+
+			if (over) {
+				ctx.font = "20px Arial";
+				ctx.fillStyle = "white";
+				ctx.fillText("GAME OVER", 180, 110);
+			}
+
 			//ctx.fillStyle = "#0f0";
 			//ctx.fillRect(x,y,10,10);
 		}
 
 		document.addEventListener('keydown',function(e){
-			btn = e.keyCode;
+			if(e.keyCode==65 || e.keyCode ==  37 || e.keyCode ==  68 || e.keyCode ==  39 || e.keyCode ==  87 || e.keyCode ==  38 || e.keyCode ==  83 || e.keyCode ==  40 ){
+				
+					btn = e.keyCode; 
+			}
+			else if(e.keyCode == 80){
+				pausa = (pausa)?false:true;
+			}
 			//console.log(e.keyCode)
 		}); 
 
 		function act(){
 
-			if(btn == 83){
-				player.y += speed;
-				if(player.y > canvas.height){
-					player.y = -10;
+			if(!pausa){
+				if(!over){
+
+					if(btn == 83){
+						player.y += speed;
+						if(player.y > canvas.height){
+							player.y = -10;
+						}
+					}
+
+					if(btn == 87){
+						player.y -= speed;
+						if(player.y < 0){
+							player.y = canvas.height;
+						}
+					}
+
+					if(btn == 68){
+						player.x += speed;
+						if(player.x > canvas.width){
+							player.x = -10;
+						}
+					}
+
+					if(btn == 65){
+						player.x -= speed;
+						if(player.x < 0){
+							player.x = canvas.width;
+						}
+					}
+
+					if(player.intersects(food)){
+						food.x = random(canvas.width);
+						food.y = random(canvas.height);
+
+						contador++;
+					}
+
+					for (var i = muros.length - 1; i >= 0; i--) {
+						if(muros[i].intersects(player)){
+							over = true;
+						}
+					}
 				}
-			}
-
-			if(btn == 87){
-				player.y -= speed;
-				if(player.y < 0){
-					player.y = canvas.height;
-				}
-			}
-
-			if(btn == 68){
-				player.x += speed;
-				if(player.x > canvas.width){
-					player.x = -10;
-				}
-			}
-
-			if(btn == 65){
-				player.x -= speed;
-				if(player.x < 0){
-					player.x = canvas.width;
-				}
-			}
-
-			if(player.intersects(food)){
-				food.x = random(canvas.width);
-				food.y = random(canvas.height);
-
-				contador++;
-			}
+			}	
 		}
 
 		function run(){
@@ -109,6 +147,11 @@
 
 			player = new Rectangle(0, 0, 10, 10);
 			food = new Rectangle(70, 50, 10, 10);
+
+			muros.push(new Rectangle(60, 50, 10, 10));
+			muros.push(new Rectangle(420, 50, 10, 10));
+			muros.push(new Rectangle(60, 170, 10, 10));
+			muros.push(new Rectangle(420, 170, 10, 10));
 
 			run();
 		} 
