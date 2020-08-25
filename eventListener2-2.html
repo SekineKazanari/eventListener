@@ -23,7 +23,7 @@
 	</div>
 	<script type="text/javascript">
 		var canvas = null, ctx = null, x = 0, y = 0;
-		var btn = null;
+		var btn = 65, speed = 5, player = null, food = null, contador = 0;
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -38,8 +38,20 @@
 		{
 			ctx.fillStyle = "black";
 			ctx.fillRect(0,0,canvas.width,canvas.height)
+
 			ctx.fillStyle = "#0f0";
-			ctx.fillRect(x,y,10,10);
+			player.paint(ctx);
+
+			ctx.fillStyle = "red";
+			food.paint(ctx);
+
+			ctx.font = "15px Arial";
+			ctx.fillStyle = "red";
+			ctx.fillText("Marcador:", 380, 20);
+			ctx.fillText(contador, 420, 40);
+
+			//ctx.fillStyle = "#0f0";
+			//ctx.fillRect(x,y,10,10);
 		}
 
 		document.addEventListener('keydown',function(e){
@@ -50,31 +62,38 @@
 		function act(){
 
 			if(btn == 83){
-				y += 2;
-				if(y > canvas.height){
-					y = -10;
+				player.y += speed;
+				if(player.y > canvas.height){
+					player.y = -10;
 				}
 			}
 
-			else if(btn == 87){
-				y -= 2;
-				if(y < 0){
-					y = canvas.height;
+			if(btn == 87){
+				player.y -= speed;
+				if(player.y < 0){
+					player.y = canvas.height;
 				}
 			}
 
-			else if(btn == 68){
-				x += 2;
-				if(x > canvas.width){
-					x = -10;
+			if(btn == 68){
+				player.x += speed;
+				if(player.x > canvas.width){
+					player.x = -10;
 				}
 			}
 
-			else if(btn == 65){
-				x -= 2;
-				if(x < 0){
-					x = canvas.width;
+			if(btn == 65){
+				player.x -= speed;
+				if(player.x < 0){
+					player.x = canvas.width;
 				}
+			}
+
+			if(player.intersects(food)){
+				food.x = random(canvas.width);
+				food.y = random(canvas.height);
+
+				contador++;
 			}
 		}
 
@@ -87,8 +106,35 @@
 		function init(){
 			canvas = document.getElementById('canvas');
 			ctx = canvas.getContext('2d');
+
+			player = new Rectangle(0, 0, 10, 10);
+			food = new Rectangle(70, 50, 10, 10);
+
 			run();
 		} 
+
+		function Rectangle(x, y, w, h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+
+			this.paint = function(ctx){
+				ctx.fillRect(this.x,this.y,this.w,this.h);
+			}
+
+			this.intersects = function(rect){
+				if(this.x < rect.x + rect.w && this.x + this.w > rect.x && 
+					this.y < rect.y + rect.h && this.y + this.h > rect.y){
+					return true;
+
+				}
+			}
+		}
+
+		function random(m){
+			return Math.floor(Math.random()*m);
+		}
 		
 		window.addEventListener('load',init,false);
 
