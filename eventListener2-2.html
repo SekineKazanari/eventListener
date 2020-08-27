@@ -26,6 +26,7 @@
 		var btn = 65, speed = 1, player = null, food = null;
 		var contador = 0, pausa = false, over = false, muros = new Array();
 		var apple = new Image(), snake = new Image();
+		var eat = new Audio(), end = new Audio(), pauseSong = new Audio();
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -87,6 +88,8 @@
 			}
 			else if(e.keyCode == 80){
 				pausa = (pausa)?false:true;
+
+				pauseSong.play();
 			}
 			//console.log(e.keyCode)
 		}); 
@@ -132,6 +135,8 @@
 							contador++;
 							speed += 0.2;
 
+							eat.play();
+
 						/*if (food.y == 50 || food.y == 170) {
 							if (food.x == 60 || food.x == 420) {
 								food.x = random(canvas.width+0.5);
@@ -144,6 +149,8 @@
 						if(muros[i].intersects(player)){
 							over = true;
 							setTimeout('reset()', 3000);
+
+							end.play();
 						}
 					}
 				}
@@ -184,6 +191,10 @@
 			muros.push(new Rectangle(420, 50, 10, 10));
 			muros.push(new Rectangle(60, 170, 10, 10));
 			muros.push(new Rectangle(420, 170, 10, 10));
+
+			eat.src = "images/eat.mp3";
+			end.src = "images/end.mp3";
+			pauseSong.src = "images/pauseSong.mp3";
 
 			run();
 		} 
