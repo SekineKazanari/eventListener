@@ -27,6 +27,7 @@
 		var contador = 0, pausa = false, over = false, muros = new Array();
 		var apple = new Image(), snake = new Image();
 		var eat = new Audio(), end = new Audio(), pauseSong = new Audio();
+		var lastUpdate = 0, FPS, frames, acumDelta = 0;
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -53,6 +54,10 @@
 			ctx.font = "15px Arial";
 			ctx.fillStyle = "#D0D313";
 			ctx.fillText("Marcador:  " + contador, 380, 20);
+			ctx.font = "12px Arial";
+			ctx.fillStyle = "white";
+			ctx.fillText("FPS:  " + FPS, 10, 240);
+
 
 			ctx.fillStyle = "#B1B1B1";
 			for (var i = muros.length - 1; i >= 0; i--) {
@@ -161,12 +166,27 @@
 			window.requestAnimationFrame(run);
 			act();
 			paint(ctx);
+
+			var now = Date.now();
+        		deltaTime = (now - lastUpdate) / 1000;
+        	if (deltaTime > 1) {
+        		deltaTime = 0;
+        	}
+        	lastUpdate = now;
+
+        	frames += 1;
+        	acumDelta += deltaTime;
+        	if (acumDelta > 1) {
+        		FPS = frames;
+        		frames = 0;
+        		acumDelta -= 1;
+        	}
 		}
 
 		function reset(){
 			over = false;
 			btn = 65;
-			speed = 2;
+			speed = 1;
 			contador = 0;
 
 			player.x = 0;
