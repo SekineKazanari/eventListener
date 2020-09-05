@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas</title>
+	<style type="text/css">
+		.content{
+			width: 80%;
+			min-height: 600px;
+			margin: auto;
+		}
+		canvas{
+			background-color: white;
+			margin:auto;
+		}
+		.otherClass{
+		}
+	</style>
+</head>
+<body>  
+	<div class='content otherClass' data-id='1'>
+		<canvas id="canvas" width="500" height="500" ></canvas>
+	</div>
+	<script type="text/javascript">
+		var canvas = null, ctx = null, x = 0, y = 0;
+		var btn = 0, speed = 1, player = null, food = null;
+		var contador = 0, pausa = false, over = false, muros = new Array();
+		var apple = new Image(), snake = new Image();
+
+		window.requestAnimationFrame = (function(){
+			return window.requestAnimationFrame || 
+			window.mozRequestAnimationFrame || 
+			window.webkitRequestAnimationFrame || 
+			function (callback){
+				window.setTimeout(callback,17);
+			}
+		}());
+
+		function paint(ctx)
+		{
+			ctx.fillStyle = "black";
+			ctx.fillRect(0,0,canvas.width,canvas.height)
+
+			ctx.fillStyle = "#0f0";
+			//player.paint(ctx);
+			ctx.drawImage(snake, player.x, player.y);
+
+			ctx.fillStyle = "red";
+			//food.paint(ctx);
+			ctx.drawImage(apple, food.x, food.y);
+
+			ctx.fillStyle = "#B1B1B1";
+			for (var i = muros.length - 1; i >= 0; i--) {
+				muros[i].paint(ctx);
+
+			}
+
+			if(pausa){
+				if(!over){
+					ctx.font = "18px Arial";
+					ctx.fillStyle = "red";
+					ctx.fillText("PAUSA", 210, 80);
+					ctx.font = "15px Arial";
+					ctx.fillStyle = "white";
+					ctx.fillText("Presiona P para continuar", 155, 105);
+				}
+			} 
+
+			if (over) {
+				ctx.font = "20px Arial";
+				ctx.fillStyle = "white";
+				ctx.fillText("GAME OVER", 180, 110);
+			}
+
+			//ctx.fillStyle = "#0f0";
+			//ctx.fillRect(x,y,10,10);
+		}
+
+		document.addEventListener('keydown',function(e){
+			if(e.keyCode==65 || e.keyCode ==  37 || e.keyCode ==  68 || e.keyCode ==  39 || e.keyCode ==  87 || e.keyCode ==  38 || e.keyCode ==  83 || e.keyCode ==  40 ){
+				
+					btn = e.keyCode; 
+			}
+			else if(e.keyCode == 80){
+				pausa = (pausa)?false:true;
+			}
+			//console.log(e.keyCode)
+		}); 
+
+		function act(){
+
+			if(!pausa){
+				if(!over){
+
+					if(btn == 83){
+						player.y += speed;
+						if(player.y > canvas.height){
+							player.y = -10;
+						}
+					}
+
+					if(btn == 87){
+						player.y -= speed;
+						if(player.y < 0){
+							player.y = canvas.height;
+						}
+					}
+
+					if(btn == 68){
+						player.x += speed;
+						if(player.x > canvas.width){
+							player.x = -10;
+						}
+					}
+
+					if(btn == 65){
+						player.x -= speed;
+						if(player.x < 0){
+							player.x = canvas.width;
+						}
+					}
+
+					if(player.intersects(food)){
+
+							food.x = random(canvas.width+0.5);
+							food.y = random(canvas.height+0.5);
+
+							//Poner 	WINNER
+
+						/*if (food.y == 50 || food.y == 170) {
+							if (food.x == 60 || food.x == 420) {
+								food.x = random(canvas.width+0.5);
+								food.y = random(canvas.height+0.5);
+							}
+						}*/
+					}
+
+					for (var i = muros.length - 1; i >= 0; i--) {
+						if(muros[i].intersects(player)){
+							over = true;
+							setTimeout('reset()', 3000);
+
+							end.play();
+						}
+					}
+				}
+			}	
+		}
+
+		function run(){
+			window.requestAnimationFrame(run);
+			act();
+			paint(ctx);
+		}
+
+		function reset(){
+			over = false;
+			btn = 0;
+			speed = 1;
+
+			player.x = 470;
+			player.y = 5;
+
+			food.x = 20;
+			food.y = 485;
+
+		}
+
+		function init(){
+			canvas = document.getElementById('canvas');
+			ctx = canvas.getContext('2d');
+
+			snake.src ="images/snake.png";
+			apple.src ="images/apple.png";
+
+			player = new Rectangle(470, 5, 10, 10);
+			food = new Rectangle(20, 485, 10, 10);
+
+			//contorno
+			muros.push(new Rectangle(0, 0, 460, 10));
+			muros.push(new Rectangle(490, 0, 10, 500));
+			muros.push(new Rectangle(0, 0, 10, 500));
+			muros.push(new Rectangle(40, 490, 460, 10));
+
+			//Interior
+			muros.push(new Rectangle(430, 40, 60, 10));
+
+
+			run();
+		} 
+
+		function Rectangle(x, y, w, h){
+			this.x = x;
+			this.y = y;
+			this.w = w;
+			this.h = h;
+
+			this.paint = function(ctx){
+				ctx.fillRect(this.x,this.y,this.w,this.h);
+			}
+
+			this.intersects = function(rect){
+				if(this.x+0.5 < rect.x + rect.w && this.x+0.5 + this.w+0.5 > rect.x && 
+					this.y+0.5 < rect.y + rect.h && this.y+0.5 + this.h+0.5 > rect.y){
+					return true;
+				}
+			}
+		}
+
+		/*
+		function random(m){
+			return Math.floor(Math.random()*m);
+		}
+		*/
+
+		function random(m){
+			var xd = Math.floor(Math.random()*m);
+
+
+			if (xd != 50 || xd != 60 || xd != 170 || xd != 420) {
+				return xd;
+			}
+		}
+		
+		window.addEventListener('load',init,false);
+
+
+		
+	</script>
+</body>
+</html>
