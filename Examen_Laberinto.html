@@ -23,7 +23,7 @@
 	<script type="text/javascript">
 		var canvas = null, ctx = null, x = 0, y = 0;
 		var btn = 0, speed = 1, player = null, food = null;
-		var contador = 0, pausa = false, over = false, muros = new Array();
+		var contador = 0, pausa = false, over = false, winner = false, muros = new Array();
 		var apple = new Image(), snake = new Image();
 
 		window.requestAnimationFrame = (function(){
@@ -71,8 +71,11 @@
 				ctx.fillText("GAME OVER", 180, 110);
 			}
 
-			//ctx.fillStyle = "#0f0";
-			//ctx.fillRect(x,y,10,10);
+			if(winner){
+				ctx.font = "20px Arial";
+				ctx.fillStyle = "white";
+				ctx.fillText("WINNER", 180, 110);
+			}
 		}
 
 		document.addEventListener('keydown',function(e){
@@ -89,57 +92,49 @@
 		function act(){
 
 			if(!pausa){
-				if(!over){
+				if (!winner) {
+					if(!over){
 
-					if(btn == 83){
-						player.y += speed;
-						if(player.y > canvas.height){
-							player.y = -10;
-						}
-					}
-
-					if(btn == 87){
-						player.y -= speed;
-						if(player.y < 0){
-							player.y = canvas.height;
-						}
-					}
-
-					if(btn == 68){
-						player.x += speed;
-						if(player.x > canvas.width){
-							player.x = -10;
-						}
-					}
-
-					if(btn == 65){
-						player.x -= speed;
-						if(player.x < 0){
-							player.x = canvas.width;
-						}
-					}
-
-					if(player.intersects(food)){
-
-							food.x = random(canvas.width+0.5);
-							food.y = random(canvas.height+0.5);
-
-							//Poner 	WINNER
-
-						/*if (food.y == 50 || food.y == 170) {
-							if (food.x == 60 || food.x == 420) {
-								food.x = random(canvas.width+0.5);
-								food.y = random(canvas.height+0.5);
+						if(btn == 83){
+							player.y += speed;
+							if(player.y > canvas.height){
+								player.y = -10;
 							}
-						}*/
-					}
+						}
 
-					for (var i = muros.length - 1; i >= 0; i--) {
-						if(muros[i].intersects(player)){
-							over = true;
+						if(btn == 87){
+							player.y -= speed;
+							if(player.y < 0){
+								player.y = canvas.height;
+							}
+						}
+
+						if(btn == 68){
+							player.x += speed;
+							if(player.x > canvas.width){
+								player.x = -10;
+							}
+						}
+
+						if(btn == 65){
+							player.x -= speed;
+							if(player.x < 0){
+								player.x = canvas.width;
+							}
+						}
+
+						if(player.intersects(food)){
+
+							//WINNER
+							winner = true;
 							setTimeout('reset()', 3000);
+						}
 
-							end.play();
+						for (var i = muros.length - 1; i >= 0; i--) {
+							if(muros[i].intersects(player)){
+								over = true;
+								setTimeout('reset()', 3000);
+							}
 						}
 					}
 				}
@@ -154,6 +149,8 @@
 
 		function reset(){
 			over = false;
+			winner = false;
+			
 			btn = 0;
 			speed = 1;
 
@@ -181,8 +178,24 @@
 			muros.push(new Rectangle(0, 0, 10, 500));
 			muros.push(new Rectangle(40, 490, 460, 10));
 
-			//Interior
+			//Camino ganador der
 			muros.push(new Rectangle(430, 40, 60, 10));
+			muros.push(new Rectangle(430, 40, 10, 60));
+			muros.push(new Rectangle(350, 100, 90, 10));
+			muros.push(new Rectangle(350, 100, 10, 40));
+			muros.push(new Rectangle(350, 100, 10, 40));
+			muros.push(new Rectangle(350, 140, 60, 10));
+			muros.push(new Rectangle(400, 140, 10, 40));
+			muros.push(new Rectangle(250, 180, 160, 10));
+
+			//Camino ganador izq
+			muros.push(new Rectangle(390, 0, 10, 60));
+			muros.push(new Rectangle(310, 60, 90, 10));
+			muros.push(new Rectangle(310, 70, 10, 80));
+			muros.push(new Rectangle(350, 100, 10, 40));
+			muros.push(new Rectangle(210, 140, 100, 10));
+			muros.push(new Rectangle(200, 140, 10, 50));
+
 
 
 			run();
@@ -206,12 +219,6 @@
 			}
 		}
 
-		/*
-		function random(m){
-			return Math.floor(Math.random()*m);
-		}
-		*/
-
 		function random(m){
 			var xd = Math.floor(Math.random()*m);
 
@@ -223,8 +230,6 @@
 		
 		window.addEventListener('load',init,false);
 
-
-		
 	</script>
 </body>
 </html>
