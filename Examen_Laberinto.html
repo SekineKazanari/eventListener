@@ -25,6 +25,7 @@
 		var btn = 0, speed = 1, player = null, food = null;
 		var contador = 0, pausa = false, over = false, winner = false, muros = new Array();
 		var apple = new Image(), snake = new Image();
+		var fondo = new Audio();
 
 		window.requestAnimationFrame = (function(){
 			return window.requestAnimationFrame || 
@@ -142,6 +143,7 @@
 		function run(){
 			window.requestAnimationFrame(run);
 			act();
+			fondo.play();
 			paint(ctx);
 		}
 
@@ -166,6 +168,9 @@
 
 			snake.src ="images/snake.png";
 			apple.src ="images/apple.png";
+
+			fondo.src="images/fondo.mp3";
+			fondo.loop = true;
 
 			player = new Rectangle(570, 5, 10, 10);
 			food = new Rectangle(20, 785, 10, 10);
